@@ -1,2 +1,4 @@
+venv/
+
 *.tgz
 DOCKING_GRIDS_AND_POSES/
