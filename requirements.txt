@@ -1,0 +1,1 @@
+-e git+https://github.com/docking-org/pydock3.git#egg=pydock3
