@@ -1,8 +1,10 @@
 #!/bin/sh
 
-source /nfs/soft/ian/env.sh
+source /wynton/home/irwin/isknight/dude-z-benchmark/env.sh
 
-sleep 5
-cd $TARGET_DIR/dockopt_job
-pydock3 dockopt - run slurm --retrodock_job_max_reattempts=5
+sleep 2
+cd $TARGET_DIR
+pydock3 retrodock - new
+cd retrodock_job/
+pydock3 retrodock - run $SCHEDULER
 

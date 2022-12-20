@@ -26,26 +26,23 @@ def main(scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", run_script_path="../..
 
     #
     dudez_path = Path(dudez_path)
-    dir_paths = [Path(x).absolute() for x in os.listdir(dudez_path) if os.path.isdir(x)]
+    dir_paths = [Path(os.path.join(dudez_path, x)).absolute() for x in os.listdir(dudez_path)]
+    print(dir_paths)
     for dir_path in dir_paths:
         if scheduler == "slurm":
             command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --signal=B:USR1@120 --array=1-1 {run_script_path}"
         elif scheduler == "sge":
-            command_str = f"{os.environ['QSUB_EXEC']} -v TARGET_DIR={dir_path} -t 1-1 {run_script_path}"
+            command_str = f"source /opt/sge/wynton/common/settings.sh;  {os.environ['QSUB_EXEC']} -v TARGET_DIR={dir_path} -v SCHEDULER={scheduler} -t 1-1 {run_script_path}"
         else:
             raise Exception(f"`scheduler` must be one of: {SCHEDULERS}")
-        env_vars_dict={
-            "TARGET_DIR": str(dir_path)
-        }
         print(dir_path)
         proc = subprocess.run(
             command_str,
             cwd=dir_path,
             shell=True,
-            env=env_vars_dict,
         )
-        print(proc.stdout)
-        print(proc.stderr)
+        print(f"stdout:\n{proc.stdout}\n")
+        print(f"stderr:\n{proc.stderr}\n")
         if timeout_seconds_between_targets:
             time.sleep(timeout_seconds_between_targets)
 

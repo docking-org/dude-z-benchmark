@@ -1,1 +1,1 @@
--e git+https://github.com/docking-org/pydock3.git#egg=pydock3
+-e git+https://github.com/docking-org/pydock3.git@beam-search#egg=pydock3
