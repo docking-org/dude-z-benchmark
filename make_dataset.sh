@@ -9,3 +9,12 @@ do
   sed -i -e 's/match_goal                    5000/match_goal                    1000/g' $f
 done
 
+wget -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
+rm -rf property_matched/*_1/
+cd property_matched/
+for f in *.tgz
+do
+  tar -xzf $f
+done
+
+
