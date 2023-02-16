@@ -1,5 +1,7 @@
 venv/
 .idea/
+.DS_Store
 
 *.tgz
 DOCKING_GRIDS_AND_POSES/
+property_matched/
