@@ -20,7 +20,18 @@ if [[ ! -d "property_matched" ]]; then
 	for f in *.tgz
 	do
 		tar -xzf $f
+		TARGET_PATH=${f%.tgz}
+		rm $TARGET_PATH/ligands/*.smi
+		rm $TARGET_PATH/decoys/*.smi
+		cd $TARGET_PATH
+		tar -czf actives.tgz ligands/
+		tar -czf decoys.tgz decoys/
+		cd ..
+		TARGET_NAME=${TARGET_PATH%_new_DUDE_1}
+		mv $TARGET_PATH/actives.tgz ../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
+                mv $TARGET_PATH/decoys.tgz ../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
 	done
+	cd ..
 fi
 
 
