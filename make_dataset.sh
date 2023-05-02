@@ -15,14 +15,12 @@ fi
 
 if [[ ! -d "property_matched" ]]; then
 	wget -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
-	rm -rf property_matched/*_1/
+	rm -rf property_matched/*/
 	cd property_matched/
 	for f in *.tgz
 	do
 		tar -xzf $f
 		TARGET_PATH=${f%.tgz}
-		rm $TARGET_PATH/ligands/*.smi
-		rm $TARGET_PATH/decoys/*.smi
 		cd $TARGET_PATH
 		tar -czf actives.tgz ligands/
 		tar -czf decoys.tgz decoys/
