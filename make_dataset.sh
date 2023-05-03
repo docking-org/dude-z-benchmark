@@ -14,7 +14,7 @@ if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
 fi
 
 if [[ ! -d "property_matched" ]]; then
-	wget -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
+	wget --no-check-certificate -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
 	rm -rf property_matched/*/
 	cd property_matched/
 	for f in *.tgz
