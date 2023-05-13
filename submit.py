@@ -15,7 +15,7 @@ SCHEDULER_NAME_TO_CLASS_DICT = {
 }
 
 
-def main(scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", run_script_path="../../run.sh", timeout_seconds_between_targets=None):
+def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", timeout_seconds_between_targets=None):
     #
     try:
         _ = SCHEDULER_NAME_TO_CLASS_DICT[scheduler]()  # TODO: actually use Scheduler class
@@ -30,7 +30,7 @@ def main(scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", run_script_path="../..
     print(dir_paths)
     for dir_path in dir_paths:
         if scheduler == "slurm":
-            command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --signal=B:USR1@120 --array=1-1 {run_script_path}"
+            command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --export=TARGET_DIR={dir_path},SCHEDULER={scheduler} --array=1-1 {run_script_path}"
         elif scheduler == "sge":
             command_str = f"source /opt/sge/wynton/common/settings.sh;  {os.environ['QSUB_EXEC']} -v TARGET_DIR={dir_path} -v SCHEDULER={scheduler} -t 1-1 {run_script_path}"
         else:
