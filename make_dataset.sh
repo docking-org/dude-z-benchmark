@@ -4,7 +4,7 @@ if [[ ! -f "DOCKING_GRIDS_AND_POSES.tgz" ]]; then
 	wget --no-check-certificate https://dudez.docking.org/DOCKING_GRIDS_AND_POSES.tgz
 fi
 
-if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then 
+if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
 	tar -xzf DOCKING_GRIDS_AND_POSES.tgz
 	for f in DOCKING_GRIDS_AND_POSES/*/INDOCK
 	do
@@ -22,14 +22,16 @@ if [[ ! -d "property_matched" ]]; then
 		tar -xzf $f
 		TARGET_PATH=${f%.tgz}
 		cd $TARGET_PATH
-		tar -czf actives.tgz ligands/
-		tar -czf decoys.tgz decoys/
+                cd ligands/
+		tar -czf positives.tgz *
+                cd ../decoys/
+		tar -czf negatives.tgz *
 		cd ..
 		TARGET_NAME=${TARGET_PATH%_new_DUDE_1}
-		mv $TARGET_PATH/actives.tgz ../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
-                mv $TARGET_PATH/decoys.tgz ../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
+		mv ligands/positives.tgz ../../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
+                mv decoys/negatives.tgz ../../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
+                cd ..
 	done
 	cd ..
 fi
-
 
