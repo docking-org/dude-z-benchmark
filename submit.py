@@ -17,6 +17,9 @@ SCHEDULER_NAME_TO_CLASS_DICT = {
 
 def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", timeout_seconds_between_targets=None):
     #
+    run_script_path = os.path.abspath(run_script_path)
+
+    #
     try:
         _ = SCHEDULER_NAME_TO_CLASS_DICT[scheduler]()  # TODO: actually use Scheduler class
     except KeyError:
