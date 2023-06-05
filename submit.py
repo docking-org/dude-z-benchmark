@@ -15,7 +15,7 @@ SCHEDULER_NAME_TO_CLASS_DICT = {
 }
 
 
-def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", timeout_seconds_between_targets=None):
+def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", job_timeout_minutes=None, params_str=None, source_script_path=None, timeout_seconds_between_targets=None):
     #
     run_script_path = os.path.abspath(run_script_path)
 
@@ -28,14 +28,28 @@ def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", timeo
         )
 
     #
+    if params_str is None:
+        params_str = ""
+    if source_script_path is None:
+        source_script_path = ""
+
+    #
     dudez_path = Path(dudez_path)
     dir_paths = [Path(os.path.join(dudez_path, x)).absolute() for x in os.listdir(dudez_path)]
-    print(dir_paths)
     for dir_path in dir_paths:
         if scheduler == "slurm":
-            command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --export=TARGET_DIR={dir_path},SCHEDULER={scheduler} --array=1-1 {run_script_path}"
+            if job_timeout_minutes is not None:
+                timeout_arg_str = f"--time={job_timeout_minutes}"
+            else:
+                timeout_arg_str = "--time=0"  # no timeout
+            command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --export=TARGET_DIR='{dir_path}',SCHEDULER='{scheduler}',PARAMS='{params_str}',SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} --array=1-1 {run_script_path}"
         elif scheduler == "sge":
-            command_str = f"source /opt/sge/wynton/common/settings.sh;  {os.environ['QSUB_EXEC']} -v TARGET_DIR={dir_path} -v SCHEDULER={scheduler} -t 1-1 {run_script_path}"
+            if job_timeout_minutes is not None:
+                job_timeout_seconds = 60 * job_timeout_minutes
+                timeout_arg_str = f"-l s_rt={job_timeout_seconds} -l h_rt={job_timeout_seconds}"
+            else:
+                timeout_arg_str = ""
+            command_str = f"{os.environ['QSUB_EXEC']} -v TARGET_DIR='{dir_path}' -v SCHEDULER='{scheduler}' -v PARAMS='{params_str}' -v SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} -t 1-1 {run_script_path}"
         else:
             raise Exception(f"`scheduler` must be one of: {SCHEDULERS}")
         print(dir_path)
