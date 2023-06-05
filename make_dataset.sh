@@ -4,6 +4,7 @@ if [[ ! -f "DOCKING_GRIDS_AND_POSES.tgz" ]]; then
 	wget --no-check-certificate https://dudez.docking.org/DOCKING_GRIDS_AND_POSES.tgz
 fi
 
+echo a
 if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
 	tar -xzf DOCKING_GRIDS_AND_POSES.tgz
 	for f in DOCKING_GRIDS_AND_POSES/*/INDOCK
@@ -13,25 +14,35 @@ if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
 	done
 fi
 
+export DUDEZ_PATH=$(realpath DOCKING_GRIDS_AND_POSES/)
+
+echo b
 if [[ ! -d "property_matched" ]]; then
 	wget --no-check-certificate -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
 	rm -rf property_matched/*/
-	cd property_matched/
-	for f in *.tgz
-	do
-		tar -xzf $f
-		TARGET_PATH=${f%.tgz}
-		cd $TARGET_PATH
-                cd ligands/
-		tar -czf positives.tgz *
-                cd ../decoys/
-		tar -czf negatives.tgz *
-		cd ..
-		TARGET_NAME=${TARGET_PATH%_new_DUDE_1}
-		mv ligands/positives.tgz ../../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
-                mv decoys/negatives.tgz ../../DOCKING_GRIDS_AND_POSES/$TARGET_NAME/
-                cd ..
-	done
-	cd ..
 fi
+
+cd property_matched/
+for f in *.tgz
+do
+	TARGET_NAME=${f%.tgz}
+	echo c
+	if [ ! -d "$TARGET_NAME" ]; then
+		tar -xzf $f
+	fi
+	echo d
+	if [ ! -f "$DUDEZ_PATH/$TARGET_NAME/positives.tgz" ] || [ ! -f "$DUDEZ_PATH/$TARGET_NAME/negatives.tgz" ]; then
+		cd $TARGET_NAME/ligands/
+		echo e
+		tar -czf positives.tgz *.db2*
+                echo f
+		cd ../decoys/
+		tar -czf negatives.tgz *.db2*
+		cd ..
+		mv ligands/positives.tgz $DUDEZ_PATH/$TARGET_NAME/positives.tgz
+                mv decoys/negatives.tgz $DUDEZ_PATH/$TARGET_NAME/negatives.tgz
+                cd ..
+	fi
+done
+cd ..
 
