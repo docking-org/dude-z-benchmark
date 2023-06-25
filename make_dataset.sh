@@ -5,12 +5,15 @@ if [[ ! -f "DOCKING_GRIDS_AND_POSES.tgz" ]]; then
 fi
 
 if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
-	tar -xzf DOCKING_GRIDS_AND_POSES.tgz
-	for f in DOCKING_GRIDS_AND_POSES/*/INDOCK
-	do
-		sed -i -e 's/DOCK 3.7 parameter/DOCK 3.8 parameter/g' $f
-		sed -i -e 's/match_goal                    5000/match_goal                    1000/g' $f
-	done
+	mkdir DOCKING_GRIDS_AND_POSES
+	cd DOCKING_GRIDS_AND_POSES/
+	tar -xzf ../DOCKING_GRIDS_AND_POSES.tgz
+#	for f in DOCKING_GRIDS_AND_POSES/*/INDOCK
+#	do
+#		sed -i -e 's/DOCK 3.7 parameter/DOCK 3.8 parameter/g' $f
+#		sed -i -e 's/match_goal                    5000/match_goal                    1000/g' $f
+#	done
+	cd ..
 fi
 
 export DUDEZ_PATH=$(realpath DOCKING_GRIDS_AND_POSES/)
@@ -24,18 +27,16 @@ cd property_matched/
 for f in *.tgz
 do
 	TARGET_NAME=${f%.tgz}
-	if [ ! -d "$TARGET_NAME" ]; then
-		tar -xzf $f
+	if [ ! -f "$TARGET_NAME/ligands.tgz" ] || [ ! -f "$TARGET_NAME/decoys.tgz" ]; then
+		mkdir -p $TARGET_NAME
+		cd $TARGET_NAME
+		rm -rf *
+		tar -xzf ../$f
+		cd ..
 	fi
 	if [ ! -f "$DUDEZ_PATH/$TARGET_NAME/positives.tgz" ] || [ ! -f "$DUDEZ_PATH/$TARGET_NAME/negatives.tgz" ]; then
-		cd $TARGET_NAME/ligands/
-		tar -czf positives.tgz *.db2*
-		cd ../decoys/
-		tar -czf negatives.tgz *.db2*
-		cd ..
-		mv ligands/positives.tgz $DUDEZ_PATH/$TARGET_NAME/positives.tgz
-                mv decoys/negatives.tgz $DUDEZ_PATH/$TARGET_NAME/negatives.tgz
-                cd ..
+		cp $TARGET_NAME/ligands.tgz $DUDEZ_PATH/$TARGET_NAME/positives.tgz
+                cp $TARGET_NAME/decoys.tgz $DUDEZ_PATH/$TARGET_NAME/negatives.tgz
 	fi
 done
 cd ..
