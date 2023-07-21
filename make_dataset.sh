@@ -16,13 +16,25 @@ if [[ ! -d "DOCKING_GRIDS_AND_POSES" ]]; then
 	cd ..
 fi
 
-export DUDEZ_PATH=$(realpath DOCKING_GRIDS_AND_POSES/)
+#
+if command -v realpath >/dev/null 2>&1; then
+	export DUDEZ_PATH=$(realpath DOCKING_GRIDS_AND_POSES/)
+else
+	if command -v readlink >/dev/null 2>&1; then
+		export DUDEZ_PATH=$(readlink -f DOCKING_GRIDS_AND_POSES/)
+	else
+		echo "Error: `realpath` and `readlink` commands are unrecognized on this system. Exiting."
+		exit 1
+	fi
+fi
 
+#
 if [[ ! -d "property_matched" ]]; then
 	wget --no-check-certificate -nH -x --no-parent -r -l1 -A \*.tgz http://dudez.docking.org/property_matched/
 	rm -rf property_matched/*/
 fi
 
+#
 cd property_matched/
 for f in *.tgz
 do
