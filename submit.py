@@ -15,7 +15,7 @@ SCHEDULER_NAME_TO_CLASS_DICT = {
 }
 
 
-def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", job_timeout_minutes=None, params_str=None, source_script_path=None, timeout_seconds_between_targets=None):
+def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", job_timeout_minutes=None, params_str=None, source_script_path=None, timeout_seconds_between_targets=None, target=None):
     #
     run_script_path = os.path.abspath(run_script_path)
 
@@ -35,7 +35,10 @@ def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", job_t
 
     #
     dudez_path = Path(dudez_path)
-    dir_paths = [Path(os.path.join(dudez_path, x)).absolute() for x in os.listdir(dudez_path)]
+    if target is not None:
+        dir_paths = [Path(os.path.join(dudez_path, target)).absolute()]
+    else:
+        dir_paths = [Path(os.path.join(dudez_path, x)).absolute() for x in os.listdir(dudez_path)]
     for dir_path in dir_paths:
         if scheduler == "slurm":
             if job_timeout_minutes is not None:
