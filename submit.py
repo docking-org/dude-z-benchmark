@@ -40,19 +40,21 @@ def main(run_script_path, scheduler, dudez_path="DOCKING_GRIDS_AND_POSES", job_t
     else:
         dir_paths = [Path(os.path.join(dudez_path, x)).absolute() for x in os.listdir(dudez_path)]
     for dir_path in dir_paths:
+        target_name = os.path.basename(dir_path)
+        job_name = f"dockopt_{target_name}"
         if scheduler == "slurm":
             if job_timeout_minutes is not None:
                 timeout_arg_str = f"--time={job_timeout_minutes}"
             else:
                 timeout_arg_str = "--time=0"  # no timeout
-            command_str = f"{os.environ['SBATCH_EXEC']} --time=0 --export=TARGET_DIR='{dir_path}',SCHEDULER='{scheduler}',PARAMS='{params_str}',SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} --array=1-1 {run_script_path}"
+            command_str = f"{os.environ['SBATCH_EXEC']} --job-name={job_name} --export=TARGET_DIR='{dir_path}',SCHEDULER='{scheduler}',PARAMS='{params_str}',SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} --array=1-1 --partition=tldr {run_script_path}"
         elif scheduler == "sge":
             if job_timeout_minutes is not None:
                 job_timeout_seconds = 60 * job_timeout_minutes
                 timeout_arg_str = f"-l s_rt={job_timeout_seconds} -l h_rt={job_timeout_seconds}"
             else:
                 timeout_arg_str = ""
-            command_str = f"{os.environ['QSUB_EXEC']} -v TARGET_DIR='{dir_path}' -v SCHEDULER='{scheduler}' -v PARAMS='{params_str}' -v SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} -t 1-1 {run_script_path}"
+            command_str = f"{os.environ['QSUB_EXEC']} -N {job_name} -v TARGET_DIR='{dir_path}' -v SCHEDULER='{scheduler}' -v PARAMS='{params_str}' -v SOURCE_SCRIPT='{source_script_path}' {timeout_arg_str} -t 1-1 {run_script_path}"
         else:
             raise Exception(f"`scheduler` must be one of: {SCHEDULERS}")
         print(dir_path)
