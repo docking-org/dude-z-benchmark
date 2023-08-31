@@ -6,15 +6,15 @@ output_csv="output.csv"
 # Write the header to the CSV file
 echo "target,retrodock_job_dudez_published_dockfiles,retrodock_job_dudez_published_dockfiles_3.8,beam_search,difference" > "$output_csv"
 
-# Find all the directories that contain the normalized_log_auc.txt files
+# Find all the directories that contain the normalized_log_auc files
 directories=$(find DOCKING_GRIDS_AND_POSES -maxdepth 2 -type d \( -name 'retrodock_job_dudez_published_dockfiles' -o -name 'retrodock_job_dudez_published_dockfiles_3.8' \))
 
-# Loop through each directory and extract the number from the normalized_log_auc.txt file
+# Loop through each directory and extract the number from the normalized_log_auc file
 for dir in $directories; do
     # Check if the directory ends with retrodock_job_dudez_published_dockfiles
     if [[ $dir == *"/retrodock_job_dudez_published_dockfiles" ]]; then
         # Extract the number from the file
-        number1=$(cat "$dir/normalized_log_auc.txt")
+        number1=$(cat "$dir/normalized_log_auc")
         number2=""
 
         # Extract target name
@@ -23,9 +23,9 @@ for dir in $directories; do
 
         # Check if the corresponding retrodock_job_dudez_published_dockfiles_3.8 directory exists
         dir_3_8="${dir%/*}/retrodock_job_dudez_published_dockfiles_3.8"
-        if [ -d "$dir_3_8" ] && [ -f "$dir_3_8/normalized_log_auc.txt" ]; then
+        if [ -d "$dir_3_8" ] && [ -f "$dir_3_8/normalized_log_auc" ]; then
             # Extract the number from the file
-            number2=$(cat "$dir_3_8/normalized_log_auc.txt")
+            number2=$(cat "$dir_3_8/normalized_log_auc")
         fi
 
         # Extract beam_search
